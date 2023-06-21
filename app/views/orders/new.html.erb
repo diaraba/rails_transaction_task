@@ -1,0 +1,35 @@
+<h1>発注登録</h1>
+
+<%= form_with(model: @order, local: true) do |form| %>
+  <% if @order.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@order.errors.count, "error") %> prohibited this order from being saved:</h2>
+      <ul>
+        <% @order.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <table border=1>
+    <thead>
+      <tr>
+        <td>商品名</td>
+        <td>注文数</td>
+      </tr>
+    </thead>
+    <tbody>
+    <% @items.each do |item| %>
+      <%= form.fields_for(:ordered_lists) do |f| %>
+        <tr>
+          <td><%= item.name %></td>
+          <td><%= f.number_field :quantity, min: 0, max: 10 %></td>
+        </tr>
+        <%= f.hidden_field :item_id, value:item.id %>
+      <% end %>
+    <% end %>
+    </tbody>
+  </table>
+  <%= form.submit '注文する' %>
+<% end %>
