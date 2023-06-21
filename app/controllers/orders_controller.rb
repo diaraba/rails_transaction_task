@@ -15,7 +15,12 @@ class OrdersController < ApplicationController
     ActiveRecord::Base.transaction do
       @order = current_user.orders.build(order_params)
 
-      Order.lock.find_by(item_id: @order.ordered_lists.first.item_id)
+      item_id = @order.ordered_lists.first.item_id
+      existing_order = Order.lock.find_by(item_id: item_id) # Verrouillage pessimiste sur la commande spécifique
+
+      if existing_order
+        raise "Another order for the same item is being processed. Please try again later."
+      end
       unless @order.save
         raise ActiveRecord::Rollback
       end 
