@@ -14,6 +14,8 @@ class OrdersController < ApplicationController
   def create
     ActiveRecord::Base.transaction do
       @order = current_user.orders.build(order_params)
+
+      Order.lock.find_by(item_id: @order.ordered_lists.first.item_id)
       unless @order.save
         raise ActiveRecord::Rollback
       end 
